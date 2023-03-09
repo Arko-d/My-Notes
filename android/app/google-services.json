@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "433504153958",
+    "project_id": "mynotes-arkodatta",
+    "storage_bucket": "mynotes-arkodatta.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433504153958:android:85b348f9cc22335f04d8a7",
+        "android_client_info": {
+          "package_name": "com.datta.arko.mynotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433504153958-mkah2s4j993rqeirn4m766shh7epmo5n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn_cD67Bj9c7x03HLzvB_tthUx5PkZP6o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433504153958-mkah2s4j993rqeirn4m766shh7epmo5n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
