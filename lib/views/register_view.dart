@@ -33,66 +33,49 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Register'),
-        ),
-        body: FutureBuilder(
-          future: Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          ),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                return Column(
-                  children: [
-                    TextField(
-                        keyboardType: TextInputType.emailAddress,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        decoration: const InputDecoration(
-                            hintText: 'Enter your email here'),
-                        controller: _email),
-                    TextField(
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        decoration: const InputDecoration(
-                            hintText: 'Enter your password here'),
-                        controller: _password),
-                    TextButton(
-                        onPressed: () async {
-                          final email = _email.text;
-                          final password = _password.text;
-                          try {
-                            await FirebaseAuth.instance
-                                .createUserWithEmailAndPassword(
-                                    email: email, password: password);
-                          } on FirebaseAuthException catch (e) {
-                            var err = e.code;
-                            switch (err) {
-                              case 'weak-password':
-                                print("WEAK PASSWORD");
-                                break;
-                              case 'email-already-in-use':
-                                print("EMAIL ALREADY IN USE");
-                                break;
-                              case 'invalid-email':
-                                print("Invalid Email");
-                                break;
-                              default:
-                                print(e.code);
-                                break;
-                            }
-                          }
-                        },
-                        child: const Text('Register')),
-                  ],
-                );
-              default:
-                return const Text('Loading...');
-            }
-          },
-        ));
+    return Column(
+      children: [
+        TextField(
+            keyboardType: TextInputType.emailAddress,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration:
+                const InputDecoration(hintText: 'Enter your email here'),
+            controller: _email),
+        TextField(
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration:
+                const InputDecoration(hintText: 'Enter your password here'),
+            controller: _password),
+        TextButton(
+            onPressed: () async {
+              final email = _email.text;
+              final password = _password.text;
+              try {
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, password: password);
+              } on FirebaseAuthException catch (e) {
+                var err = e.code;
+                switch (err) {
+                  case 'weak-password':
+                    print("WEAK PASSWORD");
+                    break;
+                  case 'email-already-in-use':
+                    print("EMAIL ALREADY IN USE");
+                    break;
+                  case 'invalid-email':
+                    print("Invalid Email");
+                    break;
+                  default:
+                    print(e.code);
+                    break;
+                }
+              }
+            },
+            child: const Text('Register')),
+      ],
+    );
   }
 }
