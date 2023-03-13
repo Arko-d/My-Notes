@@ -1,4 +1,4 @@
-import 'dart:developer' show log;
+import 'dart:developer' as devtools show log;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
             final user = FirebaseAuth.instance.currentUser;
             if (user != null) {
               if (user.emailVerified) {
-                log('Email is verified');
+                devtools.log('Email is verified');
               } else {
                 return const VerifyEmailView();
               }
@@ -69,7 +69,7 @@ class _NotesViewState extends State<NotesView> {
           actions: [
             PopupMenuButton(
               onSelected: (value) {
-                log(value as String);
+                devtools.log(value as String);
               },
               itemBuilder: (context) {
                 return const [

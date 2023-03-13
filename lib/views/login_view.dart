@@ -1,4 +1,4 @@
-import 'dart:developer' show log;
+import 'dart:developer' as devtools show log;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -64,13 +64,13 @@ class _LoginViewState extends State<LoginView> {
                   var err = e.code;
                   switch (err) {
                     case 'user-not-found':
-                      log("USER NOT FOUND");
+                      devtools.log("USER NOT FOUND");
                       break;
                     case 'wrong-password':
-                      log("WRONG PASSWORD");
+                      devtools.log("WRONG PASSWORD");
                       break;
                     default:
-                      log(e.code);
+                      devtools.log(e.code);
                       break;
                   }
                 }
