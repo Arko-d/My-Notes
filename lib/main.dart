@@ -68,13 +68,25 @@ class _NotesViewState extends State<NotesView> {
           title: const Text("Main UI"),
           actions: [
             PopupMenuButton(
-              onSelected: (value) {
-                devtools.log(value as String);
+              onSelected: (value) async {
+                switch (value) {
+                  case MenuAction.logout:
+                    final shouldLogout = await showLogOutDialog(context);
+                    if (shouldLogout) {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/login/',
+                        (_) => false,
+                      );
+                    }
+                }
               },
               itemBuilder: (context) {
                 return const [
                   PopupMenuItem<MenuAction>(
-                      value: MenuAction.logout, child: Text('Log out'))
+                    value: MenuAction.logout,
+                    child: Text('Log out'),
+                  )
                 ];
               },
             )
@@ -82,4 +94,29 @@ class _NotesViewState extends State<NotesView> {
         ),
         body: const Text('Hello World'));
   }
+}
+
+Future<bool> showLogOutDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+          title: const Text('Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Log out'),
+            )
+          ]);
+    },
+  ).then((value) => value ?? false); //the then function handles null
 }
