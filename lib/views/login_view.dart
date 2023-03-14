@@ -57,9 +57,17 @@ class _LoginViewState extends State<LoginView> {
                 final email = _email.text;
                 final password = _password.text;
                 try {
-                  final userCredential = await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: email, password: password);
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email,
+                    password: password,
+                  );
+                  if (mounted) {
+                    //Handles the error for Don't use 'BuildContext across async gaps
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/notes/',
+                      (route) => false,
+                    );
+                  }
                 } on FirebaseAuthException catch (e) {
                   var err = e.code;
                   switch (err) {
