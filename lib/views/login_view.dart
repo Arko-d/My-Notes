@@ -1,3 +1,5 @@
+import 'dart:developer' as devtools show log;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -30,50 +32,68 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-            keyboardType: TextInputType.emailAddress,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration:
-                const InputDecoration(hintText: 'Enter your email here'),
-            controller: _email),
-        TextField(
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration:
-                const InputDecoration(hintText: 'Enter your password here'),
-            controller: _password),
-        TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                final userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: email, password: password);
-              } on FirebaseAuthException catch (e) {
-                var err = e.code;
-                switch (err) {
-                  case 'user-not-found':
-                    print("USER NOT FOUND");
-                    break;
-                  case 'wrong-password':
-                    print("WRONG PASSWORD");
-                    break;
-                  default:
-                    print(e.code);
-                    break;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Login"),
+      ),
+      body: Column(
+        children: [
+          TextField(
+              keyboardType: TextInputType.emailAddress,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration:
+                  const InputDecoration(hintText: 'Enter your email here'),
+              controller: _email),
+          TextField(
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration:
+                  const InputDecoration(hintText: 'Enter your password here'),
+              controller: _password),
+          TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                try {
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email,
+                    password: password,
+                  );
+                  if (mounted) {
+                    //Handles the error for Don't use 'BuildContext across async gaps
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/notes/',
+                      (route) => false,
+                    );
+                  }
+                } on FirebaseAuthException catch (e) {
+                  var err = e.code;
+                  switch (err) {
+                    case 'user-not-found':
+                      devtools.log("USER NOT FOUND");
+                      break;
+                    case 'wrong-password':
+                      devtools.log("WRONG PASSWORD");
+                      break;
+                    default:
+                      devtools.log(e.code);
+                      break;
+                  }
                 }
-              }
-            },
-            child: const Text('Login')),
-        TextButton(
-            onPressed: () {},
-            child: const Text('Not registered yet? Register here.'))
-      ],
+              },
+              child: const Text('Login')),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/register/',
+                  (route) => false,
+                );
+              },
+              child: const Text('Not registered yet? Register here.'))
+        ],
+      ),
     );
   }
 }
