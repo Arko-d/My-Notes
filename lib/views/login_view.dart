@@ -74,15 +74,18 @@ class _LoginViewState extends State<LoginView> {
                   var err = e.code;
                   switch (err) {
                     case 'user-not-found':
-                      devtools.log("USER NOT FOUND");
+                      showErrorDialog(context,
+                          "User not found. Are you sure the user is registered?");
                       break;
                     case 'wrong-password':
-                      devtools.log("WRONG PASSWORD");
+                      showErrorDialog(context, "Wrong Credentials");
                       break;
                     default:
-                      devtools.log(e.code);
+                      showErrorDialog(context, "Error: ${e.code}");
                       break;
                   }
+                } catch (e) {
+                  showErrorDialog(context, e.toString());
                 }
               },
               child: const Text('Login')),
@@ -98,4 +101,26 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
+}
+
+//Function used to generate error dialogs
+Future<void> showErrorDialog(
+  BuildContext context,
+  String text,
+) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+          title: const Text('An error occurred'),
+          content: Text(text),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'))
+          ]);
+    },
+  );
 }
