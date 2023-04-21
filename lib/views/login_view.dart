@@ -74,18 +74,18 @@ class _LoginViewState extends State<LoginView> {
                   var err = e.code;
                   switch (err) {
                     case 'user-not-found':
-                      showErrorDialog(context,
+                      await showErrorDialog(context,
                           "User not found. Are you sure the user is registered?");
                       break;
                     case 'wrong-password':
-                      showErrorDialog(context, "Wrong Credentials");
+                      await showErrorDialog(context, "Wrong Credentials");
                       break;
                     default:
-                      showErrorDialog(context, "Error: ${e.code}");
+                      await showErrorDialog(context, "Error: ${e.code}");
                       break;
                   }
                 } catch (e) {
-                  showErrorDialog(context, e.toString());
+                  await showErrorDialog(context, e.toString());
                 }
               },
               child: const Text('Login')),
