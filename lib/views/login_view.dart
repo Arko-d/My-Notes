@@ -63,12 +63,25 @@ class _LoginViewState extends State<LoginView> {
                     email: email,
                     password: password,
                   );
-                  if (mounted) {
-                    //Handles the error for Don't use 'BuildContext across async gaps
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      notesRoute,
-                      (route) => false,
-                    );
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user?.emailVerified ?? false) {
+                    //User's email is verified
+                    if (mounted) {
+                      //Handles the error for Don't use 'BuildContext across async gaps
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        notesRoute,
+                        (route) => false,
+                      );
+                    }
+                  } else {
+                    //User's email is not verified
+                    if (mounted) {
+                      //Handles the error for Don't use 'BuildContext across async gaps
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        verifyEmailRoute,
+                        (route) => false,
+                      );
+                    }
                   }
                 } on FirebaseAuthException catch (e) {
                   var err = e.code;
