@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:mynotes/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,9 +12,40 @@ import 'package:path/path.dart' show join;
 class NotesService {
   Database? _db;
 
+  List<DatabaseNote> _notes = []; //cache
+
+  //Making notesService into a singleton so that only one instance is available and new instance are not made every time the app is opened
+  static final NotesService _shared = NotesService._sharedInstance();
+  NotesService._sharedInstance();
+  factory NotesService() => _shared;
+
+  final _notesStreamController = StreamController<
+      List<
+          DatabaseNote>>.broadcast(); //I want to be able to control a stream of database notes. broadcast() enables us to listen to the stream in the future without throwing any error
+
+  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUserException {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _cacheNotes() async {
+    final allNotes = await getAllNotes();
+    _notes = allNotes.toList();
+    _notesStreamController.add(_notes);
+  }
+
   //Updates a note
   Future<DatabaseNote> updateNote(
       {required DatabaseNote note, required String text}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     await getNote(id: note.pkNoteId);
     final updatesCount = await db.update(noteTable, {
@@ -22,12 +55,17 @@ class NotesService {
     if (updatesCount == 0) {
       throw CouldNotUpdateNoteException();
     } else {
-      return await getNote(id: note.pkNoteId);
+      final updatedNote = await getNote(id: note.pkNoteId);
+      _notes.removeWhere((note) => note.pkNoteId == updatedNote.pkNoteId);
+      _notes.add(updatedNote);
+      _notesStreamController.add(_notes);
+      return updatedNote;
     }
   }
 
   //Fetches all notes
   Future<Iterable<DatabaseNote>> getAllNotes() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final notes = await db.query(noteTable);
 
@@ -36,6 +74,7 @@ class NotesService {
 
   //Fetches a single note based on its ID
   Future<DatabaseNote> getNote({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final notes = await db.query(
       noteTable,
@@ -47,18 +86,28 @@ class NotesService {
     if (notes.isEmpty) {
       throw CouldNotFindNoteException();
     } else {
-      return DatabaseNote.fromRow(notes.first);
+      final note = DatabaseNote.fromRow(notes.first);
+      //refreshing the notes cache with current version of note
+      _notes.removeWhere((note) => note.pkNoteId == id);
+      _notes.add(note);
+      _notesStreamController.add(_notes);
+      return note;
     }
   }
 
   //Purges all data from the note table
   Future<int> deleteAllNotes() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    return await db.delete(noteTable);
+    final numberOfDeletions = await db.delete(noteTable);
+    _notes = [];
+    _notesStreamController.add(_notes);
+    return numberOfDeletions;
   }
 
   //Deletes a note from the database
   Future<void> deleteNote({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       noteTable,
@@ -67,11 +116,16 @@ class NotesService {
     );
     if (deletedCount == 0) {
       throw CouldNotDeleteNoteException();
+    } else {
+      //Stream handling
+      _notes.removeWhere((note) => note.pkNoteId == id);
+      _notesStreamController.add(_notes);
     }
   }
 
   //Creates notes
   Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     //Making sure owner exists in the database with current ID
@@ -97,11 +151,14 @@ class NotesService {
         text: text,
         isSyncedWithCloud: true);
 
+    _notes.add(note);
+    _notesStreamController.add(_notes);
     return note;
   }
 
   //Provision to fetch the notes
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -118,6 +175,7 @@ class NotesService {
 
   //Creates the user and inserts it into the database
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -140,6 +198,7 @@ class NotesService {
 
   //Deletes a user from the database
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -161,6 +220,14 @@ class NotesService {
     }
   }
 
+  Future<void> _ensureDbIsOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {
+      //empty, since we want db open
+    }
+  }
+
   //Opens the database so that other functions can read data from the database
   Future<void> open() async {
     if (_db != null) {
@@ -175,6 +242,7 @@ class NotesService {
 
       await db.execute(createUserTable);
       await db.execute(createNoteTable);
+      await _cacheNotes(); //initializes the notes cache
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectoryException();
     }
@@ -268,7 +336,7 @@ const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
 	      "email"	TEXT NOT NULL UNIQUE,
 	      PRIMARY KEY("pk_user_id" AUTOINCREMENT)
       );''';
-const createNoteTable = '''CREATE TABLE "note" (
+const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
 	      "pk_note_id"	INTEGER NOT NULL UNIQUE,
 	      "fk_user_id"	INTEGER NOT NULL,
 	      "text"	TEXT,
