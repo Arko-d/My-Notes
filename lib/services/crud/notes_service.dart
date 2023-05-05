@@ -15,13 +15,25 @@ class NotesService {
   List<DatabaseNote> _notes = []; //cache
 
   //Making notesService into a singleton so that only one instance is available and new instance are not made every time the app is opened
-  static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
-  factory NotesService() => _shared;
+  static final NotesService _shared = NotesService
+      ._sharedInstance(); // NotesService instance named _shared is created where _sharedInstance is being called. Now the _shared is initialized once and will never be re-initialized
+  NotesService._sharedInstance() {
+    //This will create a private constructor which can only be called from NotesService
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+      //notesStreamController is the name of a box that can hold a list of notes.
+      //The box is created using the StreamController class in Dart.
+      //The box is set up to be able to send data to multiple listeners at once using the broadcast() constructor.
+      //When someone starts listening to the box, the onListen() function is called.
+      //Inside the onListen() function, the current list of notes is added to the box using the sink.add() method.
+    ); //I want to be able to control a stream of database notes. broadcast() enables us to listen to the stream in the future without throwing any error
+  }
+  factory NotesService() =>
+      _shared; // when I call NotesService() from anywhere in the universe, the _shared instance will be returned, if it exists. Else it will be initialized. Hence initialization is done only once.
 
-  final _notesStreamController = StreamController<
-      List<
-          DatabaseNote>>.broadcast(); //I want to be able to control a stream of database notes. broadcast() enables us to listen to the stream in the future without throwing any error
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
   Future<DatabaseUser> getOrCreateUser({required String email}) async {
@@ -79,7 +91,7 @@ class NotesService {
     final notes = await db.query(
       noteTable,
       limit: 1,
-      where: 'id=?',
+      where: 'pk_note_id=?',
       whereArgs: [id],
     );
 
