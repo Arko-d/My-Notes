@@ -59,11 +59,16 @@ class NotesService {
       {required DatabaseNote note, required String text}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    await getNote(id: note.pkNoteId);
-    final updatesCount = await db.update(noteTable, {
-      textColumn: text,
-      isSyncedWithCloudColumn: 0,
-    });
+    DatabaseNote noteToBeUpdated = await getNote(id: note.pkNoteId);
+    final updatesCount = await db.update(
+      noteTable,
+      {
+        textColumn: text,
+        isSyncedWithCloudColumn: 0,
+      },
+      where: 'pk_note_id=?',
+      whereArgs: [noteToBeUpdated.pkNoteId],
+    );
     if (updatesCount == 0) {
       throw CouldNotUpdateNoteException();
     } else {

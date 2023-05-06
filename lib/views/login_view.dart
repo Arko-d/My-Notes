@@ -1,8 +1,7 @@
-import 'dart:developer' as devtools show log;
-
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 
 import '../constants/routes.dart';
 
@@ -103,26 +102,4 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
-}
-
-//Function used to generate error dialogs
-Future<void> showErrorDialog(
-  BuildContext context,
-  String text,
-) {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-          title: const Text('An error occurred'),
-          content: Text(text),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'))
-          ]);
-    },
-  );
 }
