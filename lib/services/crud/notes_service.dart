@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:mynotes/extensions/list/filter.dart';
 import 'package:mynotes/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +14,8 @@ class NotesService {
   Database? _db;
 
   List<DatabaseNote> _notes = []; //cache
+
+  DatabaseUser? _user;
 
   //Making notesService into a singleton so that only one instance is available and new instance are not made every time the app is opened
   static final NotesService _shared = NotesService
@@ -35,10 +38,24 @@ class NotesService {
 
   late final StreamController<List<DatabaseNote>> _notesStreamController;
 
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Stream<List<DatabaseNote>> get allNotes =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser != null) {
+          return note.fkUserId == currentUser.pkUserId;
+        } else {
+          throw UserShouldBeSetBeforeReadingAllNotesException();
+        }
+      });
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on CouldNotFindUserException {
       final createdUser = await createUser(email: email);
