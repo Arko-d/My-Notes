@@ -1,3 +1,7 @@
+//LOCAL CRUD SUPPORT
+
+/*
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -378,3 +382,4 @@ const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
 	      FOREIGN KEY("fk_user_id") REFERENCES "user"("pk_user_id"),
 	      PRIMARY KEY("pk_note_id" AUTOINCREMENT)
       );''';
+*/
