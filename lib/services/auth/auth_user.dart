@@ -4,15 +4,18 @@ import 'package:flutter/foundation.dart';
 
 @immutable //import from foundation.dart, not material.dart. This class and all subclasses have to be immutable. It can't have fields that can change.
 class AuthUser {
+  final String id;
   final bool isEmailVerified;
-  final String? email;
+  final String email;
   const AuthUser({
+    required this.id,
     required this.email,
     required this.isEmailVerified,
   });
 
   factory AuthUser.fromFirebase(User user) => AuthUser(
         isEmailVerified: user.emailVerified,
-        email: user.email,
+        email: user.email!,
+        id: user.uid,
       ); //if fromFirebase of AuthUser class is called, then AuthUser's isEmailVerified field will initialize with the boolean value of the user's email verification status.
 }
