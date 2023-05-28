@@ -117,6 +117,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
               return TextField(
                 controller: _textController,
                 keyboardType: TextInputType.multiline,
+                autofocus: ((_textController.text.isEmpty) ? true : false),
                 maxLines: null,
                 decoration: const InputDecoration(
                   hintText: 'Start typing your note',
