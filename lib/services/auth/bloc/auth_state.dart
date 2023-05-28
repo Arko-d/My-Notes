@@ -17,17 +17,14 @@ class AuthStateLoggedIn extends AuthState {
   const AuthStateLoggedIn(this.user);
 }
 
-class AuthStateLoginFailure extends AuthState {
-  final Exception exception;
-  const AuthStateLoginFailure(this.exception);
-}
-
 class AuthStateNeedsVerification extends AuthState {
   const AuthStateNeedsVerification();
 }
 
 class AuthStateLoggedOut extends AuthState {
-  const AuthStateLoggedOut();
+  final Exception?
+      exception; //Handles this type of case:: Fresh install -> State is logged out -> Enter wrong creds -> State is still logged out, but now we have an exception
+  const AuthStateLoggedOut(this.exception);
 }
 
 class AuthStateLogoutFailure extends AuthState {

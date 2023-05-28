@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/auth_provider.dart';
 import 'package:mynotes/services/auth/auth_user.dart';
@@ -94,7 +92,6 @@ class MockAuthProvider implements AuthProvider {
   }
 
   @override
-  // TODO: implement currentUser
   AuthUser? get currentUser => _user;
 
   @override

@@ -45,13 +45,10 @@ class HomePage extends StatelessWidget {
         if (state is AuthStateLoggedIn) {
           return const NotesView();
         } else if (state is AuthStateNeedsVerification) {
-          print('need verification!!');
           return const VerifyEmailView();
         } else if (state is AuthStateLoggedOut) {
-          print('LOGGED OUT!!');
           return const LoginView();
         } else {
-          print("STATE!!! ${state.toString()}");
           return const Scaffold(
             body: CircularProgressIndicator(),
           );

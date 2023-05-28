@@ -67,13 +67,10 @@ class FirebaseAuthProvider implements AuthProvider {
       switch (err) {
         case 'user-not-found':
           throw UserNotFoundAuthException();
-          break;
         case 'wrong-password':
           throw WrongPasswordAuthExcpetion();
-          break;
         default:
           throw GenericAuthException();
-          break;
       }
     } catch (_) {
       throw GenericAuthException();
