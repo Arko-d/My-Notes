@@ -61,6 +61,7 @@ class _LoginViewState extends State<LoginView> {
               if (state is AuthStateLoggedOut) {
                 if (state.exception is UserNotFoundAuthException ||
                     state.exception is WrongPasswordAuthExcpetion) {
+                  //If someone hacks code, he won't know which he is giving wrong. HACKER-PROOF!! :)
                   await showErrorDialog(context, 'Wrong Credentials');
                 } else if (state.exception is GenericAuthException) {
                   await showErrorDialog(context, 'Authentication Error');
