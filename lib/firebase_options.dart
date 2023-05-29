@@ -66,7 +66,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '433504153958',
     projectId: 'mynotes-arkodatta',
     storageBucket: 'mynotes-arkodatta.appspot.com',
-    iosClientId: '433504153958-iqnufvifdgnof2afp50531s9m4raqtqn.apps.googleusercontent.com',
+    iosClientId:
+        '433504153958-iqnufvifdgnof2afp50531s9m4raqtqn.apps.googleusercontent.com',
     iosBundleId: 'com.datta.arko.mynotes',
   );
 
@@ -76,7 +77,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '433504153958',
     projectId: 'mynotes-arkodatta',
     storageBucket: 'mynotes-arkodatta.appspot.com',
-    iosClientId: '433504153958-iqnufvifdgnof2afp50531s9m4raqtqn.apps.googleusercontent.com',
+    iosClientId:
+        '433504153958-iqnufvifdgnof2afp50531s9m4raqtqn.apps.googleusercontent.com',
     iosBundleId: 'com.datta.arko.mynotes',
   );
 }
