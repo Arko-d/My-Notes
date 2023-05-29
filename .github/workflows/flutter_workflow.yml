@@ -22,5 +22,5 @@ jobs:
       - run: flutter build apk
       - uses: actions/upload-artifact@v1
         with:
-          name: mynotes-release
-          path: build/app/outputs/apk/release/mynotes-release.apk
+          name: release-apk
+          path: build/app/outputs/apk/release/app-release.apk
